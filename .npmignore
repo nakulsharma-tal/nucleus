@@ -1,5 +1,4 @@
 .files
-.vscode
 .git
 node_modules
 public
@@ -11,3 +10,4 @@ typings
 *.sh
 *.yml
 db.sqlite
+.gpg-signing-key

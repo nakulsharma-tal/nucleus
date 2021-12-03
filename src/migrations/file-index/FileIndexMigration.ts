@@ -32,12 +32,31 @@ export default class FileIndexMigration extends BaseMigration<FileIndexMigration
         for (const version of channel.versions) {
           for (const file of version.files) {
             const indexKey = this.positioner.getIndexKey(app, channel, version, file);
-            let originalKey = path.posix.join(app.slug, channel.id, file.platform, file.arch, file.fileName);
+            let originalKey = path.posix.join(
+              app.slug,
+              channel.id,
+              file.platform,
+              file.arch,
+              file.fileName,
+            );
             if (file.platform === 'linux') {
               if (/\.deb$/.test(file.fileName)) {
-                originalKey = path.posix.join(app.slug, channel.id, file.platform, 'debian', 'binary', `${version.name}-${file.fileName}`);
+                originalKey = path.posix.join(
+                  app.slug,
+                  channel.id,
+                  file.platform,
+                  'debian',
+                  'binary',
+                  `${version.name}-${file.fileName}`,
+                );
               } else if (/\.rpm$/.test(file.fileName)) {
-                originalKey = path.posix.join(app.slug, channel.id, file.platform, 'redhat', `${version.name}-${file.fileName}`);
+                originalKey = path.posix.join(
+                  app.slug,
+                  channel.id,
+                  file.platform,
+                  'redhat',
+                  `${version.name}-${file.fileName}`,
+                );
               }
             }
 
@@ -54,7 +73,7 @@ export default class FileIndexMigration extends BaseMigration<FileIndexMigration
     }
 
     const items: MigrationItem<FileIndexMigrationItem>[] = [];
-    
+
     const fetchItem = async () => {
       if (itemFetchers.length === 0) return;
       const fetcher = itemFetchers.pop()!;
@@ -62,12 +81,16 @@ export default class FileIndexMigration extends BaseMigration<FileIndexMigration
       items.push(await fetcher());
       await fetchItem();
     };
-    await Promise.all((Array(SIMULTANEOUS_FETCHES)).fill(null).map(() => fetchItem()));
+    await Promise.all(
+      Array(SIMULTANEOUS_FETCHES)
+        .fill(null)
+        .map(() => fetchItem()),
+    );
 
     return items;
   }
 
-  async runOnItem(item: MigrationItem<FileIndexMigrationItem>)  {
+  async runOnItem(item: MigrationItem<FileIndexMigrationItem>) {
     if (item.done) return;
     this.d(`copying file from ${item.data.originalKey} to ${item.data.indexKey}`);
 

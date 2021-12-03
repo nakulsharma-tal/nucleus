@@ -16,8 +16,7 @@ describe('webbhook endpoints', () => {
   describe('/app/:id/webhook', () => {
     describe('POST', () => {
       it('should error if no url is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`);
+        const response = await helpers.request.post(`/app/${app.id}/webhook`);
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -25,11 +24,9 @@ describe('webbhook endpoints', () => {
       });
 
       it('should error if no secret is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: 'fake',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: 'fake',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -37,12 +34,10 @@ describe('webbhook endpoints', () => {
       });
 
       it('should error if a non string is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: [],
-            secret: 'cats',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: [],
+          secret: 'cats',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -50,12 +45,10 @@ describe('webbhook endpoints', () => {
       });
 
       it('should error if an invalid URL protocol is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: 'file://magic',
-            secret: 'cats',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: 'file://magic',
+          secret: 'cats',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -63,12 +56,10 @@ describe('webbhook endpoints', () => {
       });
 
       it('should error if a localhost URL is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: 'http://localhost',
-            secret: 'cats',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: 'http://localhost',
+          secret: 'cats',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -76,27 +67,23 @@ describe('webbhook endpoints', () => {
       });
 
       it('should error if a 127.0.0.1 URL is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: 'http://127.0.0.1',
-            secret: 'cats',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: 'http://127.0.0.1',
+          secret: 'cats',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
         expect(response.body.error).to.equal('Invalid URL provided');
       });
 
-      it('should succeed if a valid url and secret are provided', async function () {
+      it('should succeed if a valid url and secret are provided', async function() {
         this.timeout(4000);
 
-        const response = await helpers.request
-          .post(`/app/${app.id}/webhook`)
-          .send({
-            url: 'https://httpbin.org/post',
-            secret: 'cats',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/webhook`).send({
+          url: 'https://httpbin.org/post',
+          secret: 'cats',
+        });
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -109,22 +96,20 @@ describe('webbhook endpoints', () => {
 
   describe('/app/:id/webhook/:webhookId', () => {
     describe('DELETE', () => {
-      it('should error if the webhook does not exist', async function () {
+      it('should error if the webhook does not exist', async function() {
         this.timeout(4000);
 
-        const response = await helpers.request
-          .del(`/app/${app.id}/webhook/100`);
+        const response = await helpers.request.del(`/app/${app.id}/webhook/100`);
 
         expect(response).to.have.status(404);
         expect(response).to.be.json;
         expect(response.body.error).to.equal('Not Found');
       });
 
-      it('should unregister a valid webhook', async function () {
+      it('should unregister a valid webhook', async function() {
         this.timeout(4000);
 
-        const response = await helpers.request
-          .del(`/app/${app.id}/webhook/1`);
+        const response = await helpers.request.del(`/app/${app.id}/webhook/1`);
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -132,8 +117,7 @@ describe('webbhook endpoints', () => {
       });
 
       it('should fail to unregister an already unregistered webhook', async () => {
-        const response = await helpers.request
-          .del(`/app/${app.id}/webhook/1`);
+        const response = await helpers.request.del(`/app/${app.id}/webhook/1`);
 
         expect(response).to.have.status(404);
         expect(response).to.be.json;

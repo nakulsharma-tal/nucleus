@@ -5,12 +5,12 @@ const INITIAL_STATE = {
   hasPendingMigration: false,
 };
 
-export const migrations =  (state: MigrationSubState = INITIAL_STATE, action) => {
+export const migrations = (state: MigrationSubState = INITIAL_STATE, action) => {
   switch (action.type) {
     case actions.SET_MIGRATIONS:
       return {
         items: action.migrations,
-        hasPendingMigration: !!action.migrations.find(migration => !migration.complete),
+        hasPendingMigration: !!action.migrations.find((migration) => !migration.complete),
       };
   }
   return state;

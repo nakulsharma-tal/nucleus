@@ -38,7 +38,7 @@ export default class LatestInstallerMigration extends BaseMigration<LatestInstal
 
     for (const app of apps) {
       for (const channel of app.channels) {
-        const rolledOutVersions = channel.versions.filter(v => v.rollout === 100 && !v.dead);
+        const rolledOutVersions = channel.versions.filter((v) => v.rollout === 100 && !v.dead);
 
         for (const version of rolledOutVersions.sort((a, b) => semver.compare(a.name, b.name))) {
           for (const file of version.files) {
@@ -70,7 +70,7 @@ export default class LatestInstallerMigration extends BaseMigration<LatestInstal
     }
 
     const items: MigrationItem<LatestInstallerMigrationItem>[] = [];
-    
+
     const fetchItem = async () => {
       if (itemFetchers.length === 0) return;
       const fetcher = itemFetchers.pop()!;
@@ -78,14 +78,20 @@ export default class LatestInstallerMigration extends BaseMigration<LatestInstal
       items.push(await fetcher());
       await fetchItem();
     };
-    await Promise.all((Array(SIMULTANEOUS_FETCHES)).fill(null).map(() => fetchItem()));
+    await Promise.all(
+      Array(SIMULTANEOUS_FETCHES)
+        .fill(null)
+        .map(() => fetchItem()),
+    );
 
     return items;
   }
 
-  async runOnItem(item: MigrationItem<LatestInstallerMigrationItem>)  {
+  async runOnItem(item: MigrationItem<LatestInstallerMigrationItem>) {
     if (item.done) return;
-    this.d(`copying latest file from ${item.data.indexKey} to ${item.data.latestKey} for v${item.data.version}`);
+    this.d(
+      `copying latest file from ${item.data.indexKey} to ${item.data.latestKey} for v${item.data.version}`,
+    );
 
     const file = await this.mStore.getFile(item.data.indexKey);
     await this.mStore.putFile(item.data.latestKey, file, true);

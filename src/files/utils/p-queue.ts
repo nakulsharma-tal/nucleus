@@ -1,4 +1,8 @@
-export const runPQ = async <T, R>(items: T[], executor: (item: T) => R, simultaneous = 5): Promise<R[]> => {
+export const runPQ = async <T, R>(
+  items: T[],
+  executor: (item: T) => R,
+  simultaneous = 5,
+): Promise<R[]> => {
   if (simultaneous <= 0) {
     throw new Error('Simultaneous value must be greater than 0');
   }

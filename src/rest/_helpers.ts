@@ -26,14 +26,16 @@ export const requireAdmin: express.RequestHandler = (req, res, next) => {
 export const noPendingMigrations: express.RequestHandler = async (req, res, next) => {
   try {
     const migrations = await driver.getMigrations();
-    if (migrations.find(m => !m.complete)) {
+    if (migrations.find((m) => !m.complete)) {
       return res.status(401).json({
         error: 'There is a pending migration, this endpoint has been disabled',
       });
     }
   } catch (err) {
     d('error fetching migrations', err);
-    return res.status(500).json({ error: 'This endpoint relies on no pending migrations but we failed to list migrations' });
+    return res.status(500).json({
+      error: 'This endpoint relies on no pending migrations but we failed to list migrations',
+    });
   }
   next();
 };

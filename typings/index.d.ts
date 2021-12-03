@@ -16,14 +16,14 @@ interface S3Options {
   init?: {
     endpoint?: string;
     s3ForcePathStyle?: boolean;
-  }
+  };
 
   bucketName: string;
 
   cloudfront: {
     distributionId: string;
     publicUrl: string;
-  } | null
+  } | null;
 }
 
 interface LocalOptions {
@@ -57,7 +57,7 @@ interface SessionConfig {
   redis?: {
     host: string;
     port: number;
-  }
+  };
 }
 
 interface IConfig {
@@ -82,12 +82,12 @@ interface IConfig {
 interface User {
   id: string;
   displayName: string;
-  photos?: { value: string }[],
+  photos?: { value: string }[];
   isAdmin: boolean;
 }
 
 interface IErrorObject {
-  [key: string]: string
+  [key: string]: string;
 }
 
 type AppID = string;
@@ -112,7 +112,7 @@ interface NucleusWebHook {
   url: string;
   secret: string;
   registered: boolean;
-  errors: NucleusWebHookError[]
+  errors: NucleusWebHookError[];
 }
 
 interface NucleusWebHookError {
@@ -211,19 +211,26 @@ declare module 'is-png' {
 }
 
 declare module 'to-ico' {
-  type ToIco = (files: Buffer[], options: {
-    resize?: boolean;
-    sizes: (16 | 24 | 32 | 48 | 64 | 128 | 256)[];
-  }) => Promise<Buffer>;
+  type ToIco = (
+    files: Buffer[],
+    options: {
+      resize?: boolean;
+      sizes: (16 | 24 | 32 | 48 | 64 | 128 | 256)[];
+    },
+  ) => Promise<Buffer>;
   const foo: ToIco;
   export = foo;
 }
 
 declare module 'child-process-promise' {
-  export const spawn: (exe: string, args: string[], opts?: {
-    cwd?: string;
-    capture?: string[];
-  }) => Promise<{
+  export const spawn: (
+    exe: string,
+    args: string[],
+    opts?: {
+      cwd?: string;
+      capture?: string[];
+    },
+  ) => Promise<{
     stdout: Buffer;
     stderr: Buffer;
   }> & { childProcess: any };

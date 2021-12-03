@@ -15,11 +15,11 @@ Authentication: None
 
 This endpoint performs two simple checks to ensure Nucleus is configured correctly.
 
-* A database connection test, simply attempts to connect to the configured DB
-* A file store connection test, simply attempts to put, get and delete files in the store
+- A database connection test, simply attempts to connect to the configured DB
+- A file store connection test, simply attempts to put, get and delete files in the store
 
 You should only use this endpoint when you first launch Nucleus to validate your
-config is OK and Nucleus will operate successfully.  If you get any response that isn't
+config is OK and Nucleus will operate successfully. If you get any response that isn't
 200 OK something went wrong.
 
 ## `/rest/app/:appId/channel/:channelId/upload`

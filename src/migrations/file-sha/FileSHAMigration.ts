@@ -40,11 +40,11 @@ export default class FileSHAMigration extends BaseMigration<FileSHAMigrationItem
         }
       }
     }
-    
+
     return items;
   }
 
-  async runOnItem(item: MigrationItem<FileSHAMigrationItem>)  {
+  async runOnItem(item: MigrationItem<FileSHAMigrationItem>) {
     if (item.done) return;
     this.d(`generated SHAs for file(${item.data.fileId}) located at ${item.data.indexKey}`);
 

@@ -41,9 +41,7 @@ if (process.env.UNSAFELY_DISABLE_NUCLEUS_AUTH) {
         id: user.username,
         displayName: user.displayName,
         isAdmin: true,
-        photos: [
-          { value: user.photo },
-        ],
+        photos: [{ value: user.photo }],
       };
     }
     next();
@@ -92,35 +90,45 @@ restRouter.get('/healthcheck', (req, res) => res.json({ alive: true }));
 restRouter.use('/app', appRouter);
 restRouter.use('/auth', authenticateRouter);
 restRouter.use('/migration', migrationRouter);
-restRouter.use('/admin', (req, res, next) => {
-  if (req.user && req.user.isAdmin) return next();
-  return res.status(403).json({ error: 'Not an admin' });
-}, adminRouter);
+restRouter.use(
+  '/admin',
+  (req, res, next) => {
+    if (req.user && req.user.isAdmin) return next();
+    return res.status(403).json({ error: 'Not an admin' });
+  },
+  adminRouter,
+);
 setupApp(app);
 
-restRouter.get('/config', a(async (req, res) => {
-  const migrations = (await driver.getMigrations()).map(m => (m as any).get());
-  for (const migration of migrations) {
-    (migration as any).dependsOn = MigrationStore.get(migration.key)!.dependsOn;
-  }
+restRouter.get(
+  '/config',
+  a(async (req, res) => {
+    const migrations = (await driver.getMigrations()).map((m) => (m as any).get());
+    for (const migration of migrations) {
+      (migration as any).dependsOn = MigrationStore.get(migration.key)!.dependsOn;
+    }
 
-  res.json({
-    migrations,
-    user: req.user,
-    baseUpdateUrl: await store.getPublicBaseUrl(),
-  });
-}));
+    res.json({
+      migrations,
+      user: req.user,
+      baseUpdateUrl: await store.getPublicBaseUrl(),
+    });
+  }),
+);
 
 app.use('/rest', restRouter);
 
 let contentPromise: Promise<string> | null;
 
-app.use('*', a(async (req, res) => {
-  if (!contentPromise) {
-    contentPromise = fs.readFile(path.resolve(__dirname, '../public_out/index.html'), 'utf8');
-  }
-  res.send(await contentPromise);
-}));
+app.use(
+  '*',
+  a(async (req, res) => {
+    if (!contentPromise) {
+      contentPromise = fs.readFile(path.resolve(__dirname, '../public_out/index.html'), 'utf8');
+    }
+    res.send(await contentPromise);
+  }),
+);
 
 restRouter.use('*', (req, res) => {
   res.status(404).json({
@@ -139,19 +147,25 @@ d('Setting up server');
     return;
   }
   d('Checking GPG key');
-  if (!await isGpgKeyValid()) {
+  if (!(await isGpgKeyValid())) {
     d('Bad gpg key, invalid');
     console.error('GPG key is invalid or missing, you must provide "config.gpgSigningKey"'.red);
     process.exit(1);
   }
   if (!gpgSigningKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----')) {
     d('Bad gpg key, no public key');
-    console.error('GPG key does not contain a public key, you must include both the public and private key in "config.gpgSigningKey"'.red);
+    console.error(
+      'GPG key does not contain a public key, you must include both the public and private key in "config.gpgSigningKey"'
+        .red,
+    );
     process.exit(1);
   }
   if (!gpgSigningKey.includes('-----BEGIN PGP PRIVATE KEY BLOCK-----')) {
     d('Bad gpg key, no public key');
-    console.error('GPG key does not contain a private key, you must include both the public and private key in "config.gpgSigningKey"'.red);
+    console.error(
+      'GPG key does not contain a private key, you must include both the public and private key in "config.gpgSigningKey"'
+        .red,
+    );
     process.exit(1);
   }
   d('Good gpg key');

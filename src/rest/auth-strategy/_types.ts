@@ -13,7 +13,11 @@ interface OpenIDStrategyOptions {
   stateless: boolean;
   profile: boolean;
 }
-type OpenIDCallback<U> = (identifer: string, profile: passport.Profile, cb: PassportCallback<U>) => void;
+type OpenIDCallback<U> = (
+  identifer: string,
+  profile: passport.Profile,
+  cb: PassportCallback<U>,
+) => void;
 
 export class OpenIDStrategyType extends PassportStrategy<
   OpenIDStrategyOptions,

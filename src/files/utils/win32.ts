@@ -10,17 +10,15 @@ export interface Win32HelperOpts {
   positioner: Positioner;
 }
 
-export const generateWin32ReleasesStructure = async ({
-  app,
-  channel,
-  arch,
-  store,
-  positioner,
-}: Win32HelperOpts, rollout = 100) => {
+export const generateWin32ReleasesStructure = async (
+  { app, channel, arch, store, positioner }: Win32HelperOpts,
+  rollout = 100,
+) => {
   const root = path.posix.join(app.slug, channel.id, 'win32', arch);
 
-  const versions: NucleusVersion[] = channel.versions
-    .filter(v => !v.dead && v.rollout >= rollout);
+  const versions: NucleusVersion[] = channel.versions.filter(
+    (v) => !v.dead && v.rollout >= rollout,
+  );
 
   if (versions.length === 0) return '';
   const releases: string[] = [];
@@ -28,11 +26,11 @@ export const generateWin32ReleasesStructure = async ({
   for (const version of versions.sort((a, b) => semver.compare(a.name, b.name))) {
     for (const file of version.files) {
       if (file.fileName.endsWith('-full.nupkg') || file.fileName.endsWith('-delta.nupkg')) {
-        const fileSize = await store.getFileSize(positioner.getIndexKey(app, channel, version, file));
-        const absoluteUrl = `${await store.getPublicBaseUrl()}/${root}/${file.fileName}`;
-        releases.push(
-          `${file.sha1.toUpperCase()} ${absoluteUrl} ${fileSize}`,
+        const fileSize = await store.getFileSize(
+          positioner.getIndexKey(app, channel, version, file),
         );
+        const absoluteUrl = `${await store.getPublicBaseUrl()}/${root}/${file.fileName}`;
+        releases.push(`${file.sha1.toUpperCase()} ${absoluteUrl} ${fileSize}`);
       }
     }
   }

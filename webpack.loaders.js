@@ -5,8 +5,8 @@ module.exports = [
     loader: 'awesome-typescript-loader',
     options: {
       configFileName: 'tsconfig.public.json',
-      transpileOnly: true
-    }
+      transpileOnly: true,
+    },
   },
   {
     test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
@@ -46,10 +46,7 @@ module.exports = [
   {
     test: /\.css$/,
     exclude: /[/\\]src[/\\]/,
-    loaders: [
-      'style-loader?sourceMap',
-      'css-loader',
-    ],
+    loaders: ['style-loader?sourceMap', 'css-loader'],
   },
   {
     test: /\.scss$/,
@@ -66,7 +63,7 @@ module.exports = [
     exclude: /[/\\](node_modules|bower_components|public_out\/)[/\\]/,
     loaders: [
       'style-loader?sourceMap',
-      'css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]&sourceMap'
+      'css-loader?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]&sourceMap',
     ],
   },
 ];

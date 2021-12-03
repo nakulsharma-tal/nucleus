@@ -4,7 +4,7 @@ const INITIAL_STATE = {
   signedIn: false,
 };
 
-export const user =  (state: UserSubState = INITIAL_STATE, action) => {
+export const user = (state: UserSubState = INITIAL_STATE, action) => {
   let newState: UserSubState = state;
   switch (action.type) {
     case actions.LOG_OUT:

@@ -11,7 +11,7 @@ const serveHandler = require('serve-handler');
 let child: cp.ChildProcess | null = null;
 let server: http.Server | null = null;
 
-export const startTestNucleus = async function (this: any) {
+export const startTestNucleus = async function(this: any) {
   this.timeout(7000);
 
   if (child !== null || server !== null) {
@@ -40,7 +40,7 @@ export const startTestNucleus = async function (this: any) {
       public: path.resolve(__dirname, 'fixtures/.files'),
     });
   });
-  await new Promise(resolve => server!.listen(9999, () => resolve()));
+  await new Promise((resolve) => server!.listen(9999, () => resolve()));
   let alive = false;
   while (!alive) {
     try {
@@ -54,13 +54,13 @@ export const startTestNucleus = async function (this: any) {
 
 export const stopTestNucleus = async () => {
   if (child) {
-    const waiter = new Promise(resolve => child!.on('exit', () => resolve()));
+    const waiter = new Promise((resolve) => child!.on('exit', () => resolve()));
     child.kill();
     await waiter;
     child = null;
   }
   if (server) {
-    await new Promise(resolve => server!.close(() => resolve()));
+    await new Promise((resolve) => server!.close(() => resolve()));
     server = null;
   }
   await fs.remove(path.resolve(__dirname, 'fixtures', '.files'));
@@ -79,6 +79,6 @@ export const createApp = async (): Promise<NucleusApp> => {
     .post('/app')
     .field('name', 'Test App')
     .attach('icon', fs.createReadStream(path.resolve(__dirname, 'fixtures', 'icon.png')));
-  
+
   return response.body;
 };

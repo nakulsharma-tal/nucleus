@@ -16,9 +16,13 @@ const router = express();
 router.get('/login', passport.authenticate(strategyName), (req, res) => {
   res.redirect('/');
 });
-router.get('/callback', passport.authenticate(strategyName, { failureRedirect: '/rest/auth/login' }), (req, res) => {
-  res.redirect('/');
-});
+router.get(
+  '/callback',
+  passport.authenticate(strategyName, { failureRedirect: '/rest/auth/login' }),
+  (req, res) => {
+    res.redirect('/');
+  },
+);
 router.get('/logout', (req, res) => {
   req.logOut();
   res.redirect('/');

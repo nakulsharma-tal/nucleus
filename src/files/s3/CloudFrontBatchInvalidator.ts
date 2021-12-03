@@ -25,7 +25,9 @@ export class CloudFrontBatchInvalidator {
       return CloudFrontBatchInvalidator.noopInvalidator;
     }
     if (!invalidators[store.s3Config.cloudfront.distributionId]) {
-      invalidators[store.s3Config.cloudfront.distributionId] = new CloudFrontBatchInvalidator(store.s3Config.cloudfront);
+      invalidators[store.s3Config.cloudfront.distributionId] = new CloudFrontBatchInvalidator(
+        store.s3Config.cloudfront,
+      );
     }
     return invalidators[store.s3Config.cloudfront.distributionId];
   }
@@ -39,10 +41,10 @@ export class CloudFrontBatchInvalidator {
   public addToBatch = (key: string) => {
     if (!this.cloudfrontConfig) return;
     const sanitizedKey = encodeURI(`/${key}`);
-    if (this.queue.some(item => item === sanitizedKey)) return;
+    if (this.queue.some((item) => item === sanitizedKey)) return;
     this.queue.push(sanitizedKey);
     this.lastAdd = Date.now();
-  }
+  };
 
   private queueUp() {
     clearTimeout(this.nextTimer);
@@ -58,27 +60,32 @@ export class CloudFrontBatchInvalidator {
     this.queue = this.queue.slice(INVALIDATE_PER_ATTEMPT);
 
     const cloudFront = new AWS.CloudFront();
-    cloudFront.createInvalidation({
-      DistributionId: this.cloudfrontConfig!.distributionId,
-      InvalidationBatch: {
-        CallerReference: hat(),
-        Paths: {
-          Quantity: itemsToUse.length,
-          Items: itemsToUse,
+    cloudFront.createInvalidation(
+      {
+        DistributionId: this.cloudfrontConfig!.distributionId,
+        InvalidationBatch: {
+          CallerReference: hat(),
+          Paths: {
+            Quantity: itemsToUse.length,
+            Items: itemsToUse,
+          },
         },
       },
-    }, (err, invalidateInfo) => {
-      if (err) {
-        console.error(JSON.stringify({
-          err,
-          message: 'Failed to invalidate',
-          keys: itemsToUse,
-        }));
-        this.queue.push(...itemsToUse);
-      } else {
-        d('batch invalidation succeeded, moving along');
-      }
-      this.queueUp();
-    });
+      (err, invalidateInfo) => {
+        if (err) {
+          console.error(
+            JSON.stringify({
+              err,
+              message: 'Failed to invalidate',
+              keys: itemsToUse,
+            }),
+          );
+          this.queue.push(...itemsToUse);
+        } else {
+          d('batch invalidation succeeded, moving along');
+        }
+        this.queueUp();
+      },
+    );
   }
 }

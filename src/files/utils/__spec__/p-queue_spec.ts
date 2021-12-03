@@ -20,7 +20,7 @@ describe('runPQ', () => {
 
   it('should throw an error when simultaneous is set to 0', async () => {
     try {
-      await runPQ([1, 2, 3], async n => n + 1, 0);
+      await runPQ([1, 2, 3], async (n) => n + 1, 0);
     } catch (err) {
       expect(err).to.not.equal(null, 'should have thrown an error');
       return;
@@ -47,11 +47,15 @@ describe('runPQ', () => {
 
   it('should never have more than simultaneous things running', async () => {
     let running = 0;
-    await runPQ((Array(1000)).fill(0), async () => {
-      running += 1;
-      await new Promise(r => setTimeout(r, 1));
-      expect(running).to.be.lte(10);
-      running -= 1;
-    }, 10);
+    await runPQ(
+      Array(1000).fill(0),
+      async () => {
+        running += 1;
+        await new Promise((r) => setTimeout(r, 1));
+        expect(running).to.be.lte(10);
+        running -= 1;
+      },
+      10,
+    );
   });
 });

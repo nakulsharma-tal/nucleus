@@ -2,7 +2,7 @@ import * as actions from '../actions/apps';
 
 const INITIAL_STATE = null;
 
-export const apps =  (state: AppsSubState = INITIAL_STATE, action) => {
+export const apps = (state: AppsSubState = INITIAL_STATE, action) => {
   let newState: AppsSubState = state;
   switch (action.type) {
     case actions.SET_APPS:

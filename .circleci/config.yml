@@ -19,8 +19,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "yarn.lock" }}
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-
       - run:
           command: yarn install
           name: Install Dependencies
@@ -37,7 +37,7 @@ jobs:
       - run:
           command: cp config.template.js config.js && yarn test
           name: Run Tests
-  
+
   publish:
     docker:
       - image: circleci/node:8.12
@@ -47,8 +47,8 @@ jobs:
       - setup_remote_docker
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "yarn.lock" }}
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-
       - run:
           command: yarn install
           name: Install Dependencies

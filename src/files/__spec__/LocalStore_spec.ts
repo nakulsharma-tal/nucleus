@@ -50,11 +50,12 @@ describe('LocalStore', () => {
     });
 
     it('should write to deep keys', async () => {
-      expect(await store.putFile('key/goes/super/duper/deep', Buffer.from('deepValue'))).to.equal(true);
-      expect(await fs.readFile(
-        path.resolve(dir, 'key', 'goes', 'super', 'duper', 'deep'),
-        'utf8',
-      )).to.equal('deepValue');
+      expect(await store.putFile('key/goes/super/duper/deep', Buffer.from('deepValue'))).to.equal(
+        true,
+      );
+      expect(
+        await fs.readFile(path.resolve(dir, 'key', 'goes', 'super', 'duper', 'deep'), 'utf8'),
+      ).to.equal('deepValue');
     });
   });
 

@@ -11,7 +11,7 @@ export default class LocalStore implements IFileStore {
   }
 
   public async putFile(key: string, data: Buffer, overwrite = false) {
-    if (overwrite || !await fs.pathExists(this.getPath(key))) {
+    if (overwrite || !(await fs.pathExists(this.getPath(key)))) {
       await fs.mkdirp(path.dirname(this.getPath(key)));
       await fs.writeFile(this.getPath(key), data);
       return true;
@@ -52,11 +52,11 @@ export default class LocalStore implements IFileStore {
 
   public async listFiles(prefix: string) {
     const files: string[] = [];
-    if (!await fs.pathExists(this.getPath(prefix))) return files;
+    if (!(await fs.pathExists(this.getPath(prefix)))) return files;
     for (const child of await fs.readdir(this.getPath(prefix))) {
       const childPath = this.getPath(prefix, child);
       if ((await fs.stat(childPath)).isDirectory()) {
-        files.push(...await this.listFiles(path.join(prefix, child)));
+        files.push(...(await this.listFiles(path.join(prefix, child))));
       } else {
         files.push(path.join(prefix, child));
       }

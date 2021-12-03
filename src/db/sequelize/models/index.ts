@@ -1,4 +1,14 @@
-import { Table, Column, Model, HasMany, Unique, BelongsTo, Sequelize, DataType, ForeignKey } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  HasMany,
+  Unique,
+  BelongsTo,
+  Sequelize,
+  DataType,
+  ForeignKey,
+} from 'sequelize-typescript';
 
 import * as debug from 'debug';
 
@@ -102,7 +112,7 @@ export class Channel extends Model<Channel> {
   @HasMany(() => TemporarySave)
   temporarySaves: TemporarySave[];
 }
-// version: string, filenames: string[], arch: string, platform: NucleusPlatform// 
+// version: string, filenames: string[], arch: string, platform: NucleusPlatform//
 @Table
 export class TemporarySave extends Model<TemporarySave> {
   @Unique
@@ -219,15 +229,18 @@ function createAddColumnMigration<T>(columnName: string, table: typeof Model, de
       await queryInterface.addColumn(table.getTableName() as string, columnName, {
         type: (table as any).attributes[columnName].type,
       });
-      await table.update({
-        [columnName]: defaultValue,
-      }, {
-        where: {
-          [columnName]: {
-            $eq: null,
+      await table.update(
+        {
+          [columnName]: defaultValue,
+        },
+        {
+          where: {
+            [columnName]: {
+              $eq: null,
+            },
           },
         },
-      });
+      );
       d(`adding the ${columnName} column to the ${table.getTableName()} table`);
     }
   };
@@ -239,7 +252,7 @@ const upwardsMigrations: ((queryInterface: QueryInterface) => Promise<void>)[] =
   createAddColumnMigration('sha256', File, ''),
 ];
 
-export default async function () {
+export default async function() {
   const sequelize = new Sequelize({
     database: config.sequelize.database,
     dialect: config.sequelize.dialect,

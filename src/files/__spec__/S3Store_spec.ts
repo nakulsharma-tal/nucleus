@@ -13,7 +13,6 @@ describe('S3Store', () => {
   let cloudFrontWatcher: EventEmitter;
   let s3Config: S3Options;
 
-
   beforeEach(async () => {
     s3Config = {
       bucketName: 'myBucket',
@@ -24,7 +23,7 @@ describe('S3Store', () => {
     s3Watcher = new EventEmitter();
     cloudFrontWatcher = new EventEmitter();
     /* tslint:disable */
-    (AWS as any).S3 = function () {
+    (AWS as any).S3 = function() {
       const instance = new S3();
       stub(instance, 'headObject');
       stub(instance, 'putObject');
@@ -32,8 +31,10 @@ describe('S3Store', () => {
       s3Watcher.emit('new', instance);
       return instance;
     };
-    (AWS as any).CloudFront = function () {
-      class FakeCloudFront { createInvalidation() {} }
+    (AWS as any).CloudFront = function() {
+      class FakeCloudFront {
+        createInvalidation() {}
+      }
       const instance = new FakeCloudFront();
       stub(instance, 'createInvalidation');
       cloudFrontWatcher.emit('new', instance);
@@ -204,7 +205,11 @@ describe('S3Store', () => {
       expect(count).to.equal(2);
       const invalidateOptions2 = cf!.createInvalidation.firstCall.args[0];
       expect(invalidateOptions2.InvalidationBatch.Paths.Quantity).to.equal(3);
-      expect(invalidateOptions2.InvalidationBatch.Paths.Items).to.deep.equal(['/myKey', '/myKey2', '/myKey3']);
+      expect(invalidateOptions2.InvalidationBatch.Paths.Items).to.deep.equal([
+        '/myKey',
+        '/myKey2',
+        '/myKey3',
+      ]);
       delete s3Config.cloudfront;
     });
   });

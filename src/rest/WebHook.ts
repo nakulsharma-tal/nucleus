@@ -37,19 +37,21 @@ export default class WebHook {
       const response = await fetch(this.url, {
         method: 'POST',
         headers: {
-          Authorization: this.secret,
+          'Authorization': this.secret,
           'Content-Type': 'application/json',
           'User-Agent': `Nucleus/${nucleusVersion}`,
         },
-        body: JSON.stringify(Object.assign({}, extendedInfo, {
-          type,
-          nucleusOrigin: baseURL,
-          app: {
-            id: this.app.id,
-            name: this.app.name,
-            slug: this.app.slug,
-          },
-        })),
+        body: JSON.stringify(
+          Object.assign({}, extendedInfo, {
+            type,
+            nucleusOrigin: baseURL,
+            app: {
+              id: this.app.id,
+              name: this.app.name,
+              slug: this.app.slug,
+            },
+          }),
+        ),
       });
       if (response.status !== 200) {
         d(`Unexpected status code occurred while calling: ${this.url}`, response.status);

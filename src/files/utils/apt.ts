@@ -27,7 +27,10 @@ const getScanSourcesCommand = (dir: string, args: string[]): [string, string[]] 
   ];
 };
 
-const spawnAndGzip = async ([command, args]: [string, string[]], cwd: string): Promise<[Buffer, Buffer]> => {
+const spawnAndGzip = async (
+  [command, args]: [string, string[]],
+  cwd: string,
+): Promise<[Buffer, Buffer]> => {
   const result = await cp.spawn(command, args, {
     cwd,
     capture: ['stdout'],
@@ -56,13 +59,16 @@ const getAptFtpArchiveCommand = (dir: string, args: string[]): [string, string[]
 
 const generateReleaseFile = async (tmpDir: string, app: NucleusApp) => {
   const configFile = path.resolve(tmpDir, 'Release.conf');
-  await fs.writeFile(configFile, `APT::FTPArchive::Release::Origin "${config.organization || 'Nucleus'}";
+  await fs.writeFile(
+    configFile,
+    `APT::FTPArchive::Release::Origin "${config.organization || 'Nucleus'}";
 APT::FTPArchive::Release::Label "${app.name}";
 APT::FTPArchive::Release::Suite "stable";
 APT::FTPArchive::Release::Codename "debian";
 APT::FTPArchive::Release::Architectures "i386 amd64";
 APT::FTPArchive::Release::Components "main";
-APT::FTPArchive::Release::Description "${app.name}";`);
+APT::FTPArchive::Release::Description "${app.name}";`,
+  );
   const [exe, args] = getAptFtpArchiveCommand(tmpDir, ['-c=Release.conf', 'release', '.']);
   const { stdout } = await cp.spawn(exe, args, {
     cwd: path.resolve(tmpDir),
@@ -74,16 +80,26 @@ APT::FTPArchive::Release::Description "${app.name}";`);
 };
 
 const writeAptMetadata = async (tmpDir: string, app: NucleusApp) => {
-  const packagesContent = await spawnAndGzip(getScanPackagesCommand(tmpDir, ['binary', '/dev/null']), tmpDir);
+  const packagesContent = await spawnAndGzip(
+    getScanPackagesCommand(tmpDir, ['binary', '/dev/null']),
+    tmpDir,
+  );
   await fs.writeFile(path.resolve(tmpDir, 'binary', 'Packages'), packagesContent[0]);
   await fs.writeFile(path.resolve(tmpDir, 'binary', 'Packages.gz'), packagesContent[1]);
-  const sourcesContent = await spawnAndGzip(getScanSourcesCommand(tmpDir, ['binary', '/dev/null']), tmpDir);
+  const sourcesContent = await spawnAndGzip(
+    getScanSourcesCommand(tmpDir, ['binary', '/dev/null']),
+    tmpDir,
+  );
   await fs.writeFile(path.resolve(tmpDir, 'binary', 'Sources'), sourcesContent[0]);
   await fs.writeFile(path.resolve(tmpDir, 'binary', 'Sources.gz'), sourcesContent[1]);
   await generateReleaseFile(path.resolve(tmpDir, 'binary'), app);
 };
 
-export const initializeAptRepo = async (store: IFileStore, app: NucleusApp, channel: NucleusChannel) => {
+export const initializeAptRepo = async (
+  store: IFileStore,
+  app: NucleusApp,
+  channel: NucleusChannel,
+) => {
   await withTmpDir(async (tmpDir) => {
     await fs.mkdirs(path.resolve(tmpDir, 'binary'));
     await writeAptMetadata(tmpDir, app);
@@ -95,20 +111,13 @@ export const initializeAptRepo = async (store: IFileStore, app: NucleusApp, chan
   });
 };
 
-export const addFileToAptRepo = async (store: IFileStore, {
-  app,
-  channel,
-  internalVersion,
-  file,
-  fileData,
-}: HandlePlatformUploadOpts) => {
+export const addFileToAptRepo = async (
+  store: IFileStore,
+  { app, channel, internalVersion, file, fileData }: HandlePlatformUploadOpts,
+) => {
   await withTmpDir(async (tmpDir) => {
     const storeKey = path.posix.join(app.slug, channel.id, 'linux', 'debian');
-    await syncStoreToDirectory(
-      store,
-      storeKey,
-      tmpDir,
-    );
+    await syncStoreToDirectory(store, storeKey, tmpDir);
     await fs.mkdirs(path.resolve(tmpDir, 'binary'));
     const binaryPath = path.resolve(tmpDir, 'binary', `${internalVersion.name}-${file.fileName}`);
     if (await fs.pathExists(binaryPath)) {
@@ -116,10 +125,6 @@ export const addFileToAptRepo = async (store: IFileStore, {
     }
     await fs.writeFile(binaryPath, fileData);
     await writeAptMetadata(tmpDir, app);
-    await syncDirectoryToStore(
-      store,
-      storeKey,
-      tmpDir,
-    );
+    await syncDirectoryToStore(store, storeKey, tmpDir);
   });
 };

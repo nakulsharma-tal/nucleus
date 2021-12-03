@@ -10,7 +10,7 @@ inside nucleus.
 ### Validating a web hook's origin
 
 When you create a WebHook you will receive a secret string, we will send that
-string in the `Authorization` header of our request.  You should validate this
+string in the `Authorization` header of our request. You should validate this
 yourself to ensure you aren't receiving bogus information.
 
 ### WebHook Body

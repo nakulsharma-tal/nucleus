@@ -10,57 +10,73 @@ import LocalStore from '../../../files/local/LocalStore';
 const fakeApp = {
   slug: 'app',
   name: 'App',
-  channels: [{
-    id: 'channel',
-    versions: [{
-      name: '0.0.1',
-      rollout: 100,
-      files: [{
-        platform: 'darwin',
-        arch: 'x64',
-        fileName: 'Foo.pkg',
-        type: 'installer',
-      }, {
-        platform: 'darwin',
-        arch: 'x64',
-        fileName: 'App1.dmg',
-        type: 'installer',
-      }],
-    }, {
-      name: '0.0.2',
-      rollout: 100,
-      files: [{
-        platform: 'darwin',
-        arch: 'x64',
-        fileName: 'App2.dmg',
-        type: 'installer',
-      }, {
-        platform: 'win32',
-        arch: 'ia32',
-        fileName: 'App.exe',
-        type: 'installer',
-      }, {
-        platform: 'linux',
-        arch: 'x64',
-        fileName: 'App.deb',
-        type: 'installer',
-      }, {
-        platform: 'darwin',
-        arch: 'x64',
-        fileName: 'Test.zip',
-        type: 'update',
-      }],
-    }, {
-      name: '0.0.3',
-      rollout: 99,
-      files: [{
-        platform: 'win32',
-        arch: 'ia32',
-        fileName: 'App3.exe',
-        type: 'installer',
-      }],
-    }],
-  }],
+  channels: [
+    {
+      id: 'channel',
+      versions: [
+        {
+          name: '0.0.1',
+          rollout: 100,
+          files: [
+            {
+              platform: 'darwin',
+              arch: 'x64',
+              fileName: 'Foo.pkg',
+              type: 'installer',
+            },
+            {
+              platform: 'darwin',
+              arch: 'x64',
+              fileName: 'App1.dmg',
+              type: 'installer',
+            },
+          ],
+        },
+        {
+          name: '0.0.2',
+          rollout: 100,
+          files: [
+            {
+              platform: 'darwin',
+              arch: 'x64',
+              fileName: 'App2.dmg',
+              type: 'installer',
+            },
+            {
+              platform: 'win32',
+              arch: 'ia32',
+              fileName: 'App.exe',
+              type: 'installer',
+            },
+            {
+              platform: 'linux',
+              arch: 'x64',
+              fileName: 'App.deb',
+              type: 'installer',
+            },
+            {
+              platform: 'darwin',
+              arch: 'x64',
+              fileName: 'Test.zip',
+              type: 'update',
+            },
+          ],
+        },
+        {
+          name: '0.0.3',
+          rollout: 99,
+          files: [
+            {
+              platform: 'win32',
+              arch: 'ia32',
+              fileName: 'App3.exe',
+              type: 'installer',
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 describe('LatestInstallerMigration', () => {
@@ -94,7 +110,7 @@ describe('LatestInstallerMigration', () => {
       fakeDriver.getApps.returns(Promise.resolve([]));
       expect(await migrator.getItems()).to.deep.equal([]);
     });
-    
+
     it('should check for existence of ref files and mark as done appropriately', async () => {
       fakeDriver.getApps.returns(Promise.resolve([fakeApp]));
       const getFileStub = stub(store, 'getFile');
@@ -103,7 +119,10 @@ describe('LatestInstallerMigration', () => {
       const items = await migrator.getItems();
       expect(items.length).to.equal(4);
       expect(items[0].done).to.equal(false);
-      expect(items[1].done).to.equal(true, 'a file whos latest is already there should be marked as done');
+      expect(items[1].done).to.equal(
+        true,
+        'a file whos latest is already there should be marked as done',
+      );
       expect(items[2].done).to.equal(false);
       expect(items[3].done).to.equal(false);
     });
@@ -113,7 +132,10 @@ describe('LatestInstallerMigration', () => {
       const getFileStub = stub(store, 'getFile');
       getFileStub.returns(Promise.resolve(Buffer.from('0.0.0')));
       const items = await migrator.getItems();
-      expect(items.some(item => item.data.version === '0.0.3')).to.equal(false, 'should not use a non-100 rollout');
+      expect(items.some((item) => item.data.version === '0.0.3')).to.equal(
+        false,
+        'should not use a non-100 rollout',
+      );
     });
 
     it('should use the latest version of an installer when there are duplicates', async () => {
@@ -121,7 +143,7 @@ describe('LatestInstallerMigration', () => {
       const getFileStub = stub(store, 'getFile');
       getFileStub.returns(Promise.resolve(Buffer.from('0.0.0')));
       const items = await migrator.getItems();
-      const dmgItem = items.find(item => item.data.latestKey.endsWith('.dmg'))!;
+      const dmgItem = items.find((item) => item.data.latestKey.endsWith('.dmg'))!;
       expect(dmgItem).to.not.equal(null);
       expect(dmgItem.data).to.have.property('version', '0.0.2');
     });
@@ -131,7 +153,7 @@ describe('LatestInstallerMigration', () => {
       const getFileStub = stub(store, 'getFile');
       getFileStub.returns(Promise.resolve(Buffer.from('0.0.0')));
       const items = await migrator.getItems();
-      const zipItem = items.find(item => item.data.latestKey.endsWith('.zip'));
+      const zipItem = items.find((item) => item.data.latestKey.endsWith('.zip'));
       expect(zipItem).to.equal(undefined);
     });
   });

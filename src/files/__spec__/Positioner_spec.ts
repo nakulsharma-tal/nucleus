@@ -26,16 +26,18 @@ const promiseStub = () => {
 
 const v1 = {
   currentRelease: '0.0.2',
-  releases: [{
-    updateTo: {
-      name: '0.0.2',
-      notes: '',
-      pub_date: 'MyDate',
-      url: 'https://foo.bar/fake_slug/fake_channel_id/darwin/x64/thing.zip',
+  releases: [
+    {
+      updateTo: {
+        name: '0.0.2',
+        notes: '',
+        pub_date: 'MyDate',
+        url: 'https://foo.bar/fake_slug/fake_channel_id/darwin/x64/thing.zip',
+        version: '0.0.2',
+      },
       version: '0.0.2',
     },
-    version: '0.0.2',
-  }],
+  ],
 };
 
 const v2 = Object.assign({}, v1);
@@ -159,7 +161,11 @@ describe('Positioner', () => {
 
       describe('for already uploaded releases -- potentiallyUpdateLatestInstallers', () => {
         it('should do nothing if the rollout is not 100%', async () => {
-          await positioner.potentiallyUpdateLatestInstallers(lock, fakeApp, Object.assign({}, fakeChannel, { versions: [{ rollout: 50 } as any] }));
+          await positioner.potentiallyUpdateLatestInstallers(
+            lock,
+            fakeApp,
+            Object.assign({}, fakeChannel, { versions: [{ rollout: 50 } as any] }),
+          );
           expect(fakeStore.putFile.callCount).to.equal(0);
         });
 
@@ -168,37 +174,51 @@ describe('Positioner', () => {
             lock,
             fakeApp,
             Object.assign({}, fakeChannel, {
-              versions: [{
-                name: '0.0.2',
-                rollout: 100,
-                files: [{
-                  type: 'installer',
-                  fileName: 'test.exe',
-                  platform: 'win32',
-                  arch: 'x64',
-                }, {
-                  type: 'update',
-                  fileName: 'test.nupkg',
-                  platform: 'win32',
-                  arch: 'x64',
-                }, {
-                  type: 'installer',
-                  fileName: 'test.dmg',
-                  platform: 'darwin',
-                  arch: 'x64',
-                }],
-              } as any],
+              versions: [
+                {
+                  name: '0.0.2',
+                  rollout: 100,
+                  files: [
+                    {
+                      type: 'installer',
+                      fileName: 'test.exe',
+                      platform: 'win32',
+                      arch: 'x64',
+                    },
+                    {
+                      type: 'update',
+                      fileName: 'test.nupkg',
+                      platform: 'win32',
+                      arch: 'x64',
+                    },
+                    {
+                      type: 'installer',
+                      fileName: 'test.dmg',
+                      platform: 'darwin',
+                      arch: 'x64',
+                    },
+                  ],
+                } as any,
+              ],
             }),
           );
           expect(
-            fakeStore.getFile.getCalls().filter(call => !call.args[0].endsWith('.lock')).length,
+            fakeStore.getFile.getCalls().filter((call) => !call.args[0].endsWith('.lock')).length,
           ).to.equal(4);
           expect(fakeStore.putFile.callCount).to.equal(4);
-          expect(fakeStore.putFile.getCall(0).args[0]).to.equal('fake_slug/fake_channel_id/latest/win32/x64/Fake Slug.exe');
-          expect(fakeStore.putFile.getCall(1).args[0]).to.equal('fake_slug/fake_channel_id/latest/win32/x64/Fake Slug.exe.ref');
+          expect(fakeStore.putFile.getCall(0).args[0]).to.equal(
+            'fake_slug/fake_channel_id/latest/win32/x64/Fake Slug.exe',
+          );
+          expect(fakeStore.putFile.getCall(1).args[0]).to.equal(
+            'fake_slug/fake_channel_id/latest/win32/x64/Fake Slug.exe.ref',
+          );
           expect(fakeStore.putFile.getCall(1).args[1].toString()).to.equal('0.0.2');
-          expect(fakeStore.putFile.getCall(2).args[0]).to.equal('fake_slug/fake_channel_id/latest/darwin/x64/Fake Slug.dmg');
-          expect(fakeStore.putFile.getCall(3).args[0]).to.equal('fake_slug/fake_channel_id/latest/darwin/x64/Fake Slug.dmg.ref');
+          expect(fakeStore.putFile.getCall(2).args[0]).to.equal(
+            'fake_slug/fake_channel_id/latest/darwin/x64/Fake Slug.dmg',
+          );
+          expect(fakeStore.putFile.getCall(3).args[0]).to.equal(
+            'fake_slug/fake_channel_id/latest/darwin/x64/Fake Slug.dmg.ref',
+          );
           expect(fakeStore.putFile.getCall(3).args[1].toString()).to.equal('0.0.2');
         });
       });
@@ -363,7 +383,10 @@ describe('Positioner', () => {
           'fake_slug/fake_channel_id/win32/ia32/thing-full.nupkg',
         );
         expect(fakeStore.putFile.firstCall.args[1]).to.equal(fakeBuffer);
-        expect(fakeStore.putFile.firstCall.args[2]).to.equal(undefined, 'should not override existing release');
+        expect(fakeStore.putFile.firstCall.args[2]).to.equal(
+          undefined,
+          'should not override existing release',
+        );
       });
 
       it('should update the RELEASES file with correct hash and filename for all nupkg uploads', async () => {
@@ -394,13 +417,20 @@ describe('Positioner', () => {
         expect(fakeStore.putFile.secondCall.args[1].toString()).to.equal(
           '0F2320FC3B29E1CD9F989DBF547BCD4D21D3BD12 https://foo.bar/fake_slug/fake_channel_id/win32/ia32/thing-full.nupkg 8',
         );
-        expect(fakeStore.putFile.secondCall.args[2]).to.equal(true, 'should override existing RELEASES');
+        expect(fakeStore.putFile.secondCall.args[2]).to.equal(
+          true,
+          'should override existing RELEASES',
+        );
       });
 
       it('should append to the existing RELEASES file if available', async () => {
         const fakeFullBuffer = Buffer.from('my nupkg');
         const fakeDeltaBuffer = Buffer.from('my delta nupkg');
-        fakeStore.getFile.returns(Promise.resolve(Buffer.from('0F2320FC3B29E1CD9F989DBF547BCD4D21D3BD12 thing-full.nupkg 8')));
+        fakeStore.getFile.returns(
+          Promise.resolve(
+            Buffer.from('0F2320FC3B29E1CD9F989DBF547BCD4D21D3BD12 thing-full.nupkg 8'),
+          ),
+        );
         const fullFile = {
           ...generateSHAs(fakeFullBuffer),
           arch: 'ia32',
@@ -420,11 +450,13 @@ describe('Positioner', () => {
         await positioner.handleUpload(lock, {
           app: fakeApp,
           channel: Object.assign({}, fakeChannel, {
-            versions: [{
-              name: '0.0.2',
-              rollout: 100,
-              files: [fullFile, deltaFile],
-            }],
+            versions: [
+              {
+                name: '0.0.2',
+                rollout: 100,
+                files: [fullFile, deltaFile],
+              },
+            ],
           }),
           internalVersion: { name: '0.0.2' } as any,
           file: deltaFile,
@@ -437,7 +469,7 @@ describe('Positioner', () => {
         );
         expect(fakeStore.putFile.secondCall.args[1].toString()).to.equal(
           '0F2320FC3B29E1CD9F989DBF547BCD4D21D3BD12 https://foo.bar/fake_slug/fake_channel_id/win32/ia32/thing-full.nupkg 8\n' +
-          'EF5518DDAF73D40E2A7A31C627702CFFBF59862D https://foo.bar/fake_slug/fake_channel_id/win32/ia32/thing-delta.nupkg 14',
+            'EF5518DDAF73D40E2A7A31C627702CFFBF59862D https://foo.bar/fake_slug/fake_channel_id/win32/ia32/thing-delta.nupkg 14',
         );
       });
 
@@ -476,7 +508,7 @@ describe('Positioner', () => {
           },
           fileData: Buffer.from(''),
         });
-        await positioner.handleUpload(lock,{
+        await positioner.handleUpload(lock, {
           app: fakeApp,
           channel: fakeChannel,
           internalVersion: { name: '0.0.2' } as any,
@@ -537,7 +569,7 @@ describe('Positioner', () => {
         expect(fakeStore.putFile.firstCall.args[1]).to.equal(fakeBuffer);
       });
 
-      it('should create a RELEASES.json file if it doesn\'t exist when uploading zips', async () => {
+      it("should create a RELEASES.json file if it doesn't exist when uploading zips", async () => {
         const fakeBuffer = Buffer.from('my zip');
         const file: NucleusFile = {
           ...generateSHAs(fakeBuffer),

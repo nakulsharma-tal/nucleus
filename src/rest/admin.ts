@@ -11,25 +11,28 @@ const a = createA(d);
 
 const adminRouter = express();
 
-adminRouter.get('/release-locks', a(async (req, res) => {
-  const apps = await driver.getApps();
-  const positioner = new Positioner(store);
+adminRouter.get(
+  '/release-locks',
+  a(async (req, res) => {
+    const apps = await driver.getApps();
+    const positioner = new Positioner(store);
 
-  d(`admin user ${req.user.id} is clearing all existing locks`);
+    d(`admin user ${req.user.id} is clearing all existing locks`);
 
-  for (const app of apps) {
-    const lock = await positioner.currentLock(app);
-    if (lock) {
-      d('clearing lock for app:', app.slug);
-      await positioner.releaseLock(app, lock);
+    for (const app of apps) {
+      const lock = await positioner.currentLock(app);
+      if (lock) {
+        d('clearing lock for app:', app.slug);
+        await positioner.releaseLock(app, lock);
+      }
     }
-  }
 
-  d('locks cleared');
+    d('locks cleared');
 
-  res.json({
-    success: 'Locks cleared',
-  });
-}));
+    res.json({
+      success: 'Locks cleared',
+    });
+  }),
+);
 
 export default adminRouter;

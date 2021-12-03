@@ -53,7 +53,7 @@ module.exports = {
    */
   local: {
     root: path.resolve(__dirname, '.files'),
-    staticUrl: 'http://localhost:9999'
+    staticUrl: 'http://localhost:9999',
   },
 
   /**
@@ -72,10 +72,11 @@ module.exports = {
 
     bucketName: '', // The name for your S3 Bucket
 
-    cloudfront: { // If you don't have CloudFront set up and just want to use the S3 bucket set this to "null
+    cloudfront: {
+      // If you don't have CloudFront set up and just want to use the S3 bucket set this to "null
       distributionId: '', // The CloudFront distribution ID, used for invalidating files
       publicUrl: '', // Fully qualified URL for the root of the CloudFront proxy for the S3 bucket
-    }
+    },
   },
 
   /**
@@ -99,12 +100,14 @@ module.exports = {
    * password: Well, uhhh, their password
    * photo: A URL for their profile, entirely optional, just makes things look nicer ;)
    */
-  localAuth: [{
-    displayName: 'Charlie',
-    username: 'charlie',
-    password: 'charlie',
-    photo: 'https://pbs.twimg.com/profile_images/1219364727/charlie-support_400x400.png'
-  }],
+  localAuth: [
+    {
+      displayName: 'Charlie',
+      username: 'charlie',
+      password: 'charlie',
+      photo: 'https://pbs.twimg.com/profile_images/1219364727/charlie-support_400x400.png',
+    },
+  ],
 
   /**
    * OpenID authentication details
@@ -123,7 +126,7 @@ module.exports = {
     stateless: true,
     profile: true,
     providerURL: 'https://auth.myservice.com/openid/v2/op',
-    domain: 'myservice.com'
+    domain: 'myservice.com',
   },
 
   /**
@@ -138,7 +141,7 @@ module.exports = {
    */
   github: {
     clientID: '',
-    clientSecret: ''
+    clientSecret: '',
   },
 
   /**
@@ -163,8 +166,8 @@ module.exports = {
 
     redis: {
       host: '',
-      port: ''
-    }
+      port: '',
+    },
   },
 
   organization: 'My Company Here',
@@ -182,5 +185,5 @@ module.exports = {
    * any channel will always be 100% but all future releases will have a
    * default rollout value of this setting
    */
-  defaultRollout: 0
+  defaultRollout: 0,
 };

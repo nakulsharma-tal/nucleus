@@ -41,6 +41,7 @@ config.plugins.unshift(
   new ExtractTextPlugin({
     filename: '[contenthash].css',
     allChunks: true,
-  }));
+  }),
+);
 
 module.exports = config;

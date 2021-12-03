@@ -13,35 +13,28 @@ describe('app endpoints', () => {
   describe('/app', () => {
     describe('POST', () => {
       it('should error if no name is provided', async () => {
-        const response = await helpers.request
-          .post('/app');
+        const response = await helpers.request.post('/app');
 
         expect(response).to.have.status(400);
         expect(response.body.error).to.equal('Missing required body param: "name"');
       });
 
       it('should error if an empty name is provided', async () => {
-        const response = await helpers.request
-          .post('/app')
-          .field('name', '');
+        const response = await helpers.request.post('/app').field('name', '');
 
         expect(response).to.have.status(400);
         expect(response.body.error).to.equal('Your app name can not be an empty string');
       });
 
       it('should error if no icon is provided', async () => {
-        const response = await helpers.request
-          .post('/app')
-          .field('name', 'Test App');
+        const response = await helpers.request.post('/app').field('name', 'Test App');
 
         expect(response).to.have.status(400);
         expect(response.body.error).to.equal('Missing icon file');
       });
 
       it('should error if a reserved name is provided', async () => {
-        const response = await helpers.request
-          .post('/app')
-          .field('name', '__healthcheck');
+        const response = await helpers.request.post('/app').field('name', '__healthcheck');
 
         expect(response).to.have.status(400);
         expect(response.body.error).to.equal('You can not call your application __healthcheck');
@@ -55,11 +48,21 @@ describe('app endpoints', () => {
 
         expect(response).to.have.status(200);
         expect(response.body).to.have.property('name', 'Test App');
-        expect(response.body).to.have.property('slug', 'Test-App', 'should sanitize the name into a slug');
-        expect(response.body.team).to.deep.equal(['charlie'], 'the initial team should just be charlie');
+        expect(response.body).to.have.property(
+          'slug',
+          'Test-App',
+          'should sanitize the name into a slug',
+        );
+        expect(response.body.team).to.deep.equal(
+          ['charlie'],
+          'the initial team should just be charlie',
+        );
         expect(response.body.channels).to.deep.equal([], 'should have no channels initially');
         expect(response.body.webHooks).to.deep.equal([], 'should have no webhooks initially');
-        expect(response.body.token).to.have.length.greaterThan(0, 'should have a non zero length random string token');
+        expect(response.body.token).to.have.length.greaterThan(
+          0,
+          'should have a non zero length random string token',
+        );
       });
 
       it('should create an app with de-duped slug if the same app name already exists', async () => {
@@ -67,9 +70,13 @@ describe('app endpoints', () => {
           .post('/app')
           .field('name', 'Test App')
           .attach('icon', fs.createReadStream(path.resolve(__dirname, 'fixtures', 'icon.png')));
-        
+
         expect(response).to.have.status(200);
-        expect(response.body).to.have.property('slug', 'Test-App2', 'should dedupe the name into a slug');
+        expect(response.body).to.have.property(
+          'slug',
+          'Test-App2',
+          'should dedupe the name into a slug',
+        );
       });
 
       it('should put the app icon in a known position in the file store', async () => {
@@ -86,8 +93,7 @@ describe('app endpoints', () => {
 
     describe('GET', () => {
       it('should list all the apps', async () => {
-        const response = await helpers.request
-          .get('/app');
+        const response = await helpers.request.get('/app');
 
         expect(response).to.be.json;
         expect(response.body).to.have.lengthOf(2);
@@ -100,8 +106,7 @@ describe('app endpoints', () => {
   describe('/app/:id', () => {
     describe('GET', () => {
       it('should return not found when given an invalid app ID', async () => {
-        const response = await helpers.request
-          .get('/app/500');
+        const response = await helpers.request.get('/app/500');
 
         expect(response).to.have.status(404);
         expect(response).to.be.json;
@@ -109,8 +114,7 @@ describe('app endpoints', () => {
 
       it('should return the app when given a valid app ID', async () => {
         const app = await helpers.createApp();
-        const response = await helpers.request
-          .get(`/app/${app.id}`);
+        const response = await helpers.request.get(`/app/${app.id}`);
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -128,8 +132,7 @@ describe('app endpoints', () => {
       });
 
       it('should error if no icon is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/icon`);
+        const response = await helpers.request.post(`/app/${app.id}/icon`);
 
         expect(response).to.have.status(400);
         expect(response.body.error).to.equal('Missing icon file');
@@ -162,8 +165,7 @@ describe('app endpoints', () => {
       });
 
       it('should regenerate the token for the given app', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/refresh_token`);
+        const response = await helpers.request.post(`/app/${app.id}/refresh_token`);
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -171,15 +173,13 @@ describe('app endpoints', () => {
       });
 
       it('should persist the change to the token', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/refresh_token`);
+        const response = await helpers.request.post(`/app/${app.id}/refresh_token`);
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
         expect(response.body.token).to.not.equal(app.token);
-        
-        const appResponse = await helpers.request
-          .get(`/app/${app.id}`);
+
+        const appResponse = await helpers.request.get(`/app/${app.id}`);
 
         expect(appResponse.body.token).to.equal(response.body.token);
       });
@@ -195,8 +195,7 @@ describe('app endpoints', () => {
       });
 
       it('should error if no team is provided', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/team`);
+        const response = await helpers.request.post(`/app/${app.id}/team`);
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -204,11 +203,9 @@ describe('app endpoints', () => {
       });
 
       it('should error if the provided team is invalid JSON', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/team`)
-          .send({
-            team: 'abc[]',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/team`).send({
+          team: 'abc[]',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -216,11 +213,9 @@ describe('app endpoints', () => {
       });
 
       it('should error if the provided team is not an array', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/team`)
-          .send({
-            team: '"foo"',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/team`).send({
+          team: '"foo"',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -228,11 +223,9 @@ describe('app endpoints', () => {
       });
 
       it('should error if the provided team does not contain the current user', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/team`)
-          .send({
-            team: '[]',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/team`).send({
+          team: '[]',
+        });
 
         expect(response).to.have.status(400);
         expect(response).to.be.json;
@@ -240,11 +233,9 @@ describe('app endpoints', () => {
       });
 
       it('should update the team when given a valid team', async () => {
-        const response = await helpers.request
-          .post(`/app/${app.id}/team`)
-          .send({
-            team: '["charlie","test","new"]',
-          });
+        const response = await helpers.request.post(`/app/${app.id}/team`).send({
+          team: '["charlie","test","new"]',
+        });
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;
@@ -252,14 +243,11 @@ describe('app endpoints', () => {
       });
 
       it('should persist the update to the team when given a valid team', async () => {
-        await helpers.request
-          .post(`/app/${app.id}/team`)
-          .send({
-            team: '["charlie","thing"]',
-          });
+        await helpers.request.post(`/app/${app.id}/team`).send({
+          team: '["charlie","thing"]',
+        });
 
-        const response = await helpers.request
-          .get(`/app/${app.id}`);
+        const response = await helpers.request.get(`/app/${app.id}`);
 
         expect(response).to.have.status(200);
         expect(response).to.be.json;

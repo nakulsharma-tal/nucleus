@@ -6,20 +6,20 @@ A configurable and versatile update server for all your Electron apps
 
 ## Features
 
-* Multiple applications
-* Multiple channels for each application
-* Companion publisher for [electron-forge](https://github.com/electron-userland/electron-forge) to greatly simplify release publishing
-* Backed by a static file store so minimal server costs
-* One command to run so insanely simple to set up
-* [Staged Rollouts](docs/Staged%20Rollouts.md)
-  * macOS
-  * Windows
-* [Latest Downloads](docs/Latest%20Releases.md) - Static URL's for downloading the latest version of your application
-* Platform Support:
-  * macOS
-  * Windows
-  * Linux - RedHat
-  * Linux - Debian
+- Multiple applications
+- Multiple channels for each application
+- Companion publisher for [electron-forge](https://github.com/electron-userland/electron-forge) to greatly simplify release publishing
+- Backed by a static file store so minimal server costs
+- One command to run so insanely simple to set up
+- [Staged Rollouts](docs/Staged%20Rollouts.md)
+  - macOS
+  - Windows
+- [Latest Downloads](docs/Latest%20Releases.md) - Static URL's for downloading the latest version of your application
+- Platform Support:
+  - macOS
+  - Windows
+  - Linux - RedHat
+  - Linux - Debian
 
 ## Electron Version Requirements
 
@@ -66,19 +66,18 @@ information check out the [Uploading Docs](docs/Uploading.md).
 
 Please see the following documents for more information on Nucleus and how it works.
 
-* [Internal Endpoints](docs/Endpoints.md)
-* [Uploading Releases](docs/Uploading.md)
-* [Architecture](docs/Architecture.md)
-* [Versioned Public API](docs/API.md)
-* [Staged Rollouts](docs/Staged%20Rollouts.md)
-* [Latest Releases](docs/Latest%20Releases.md)
+- [Internal Endpoints](docs/Endpoints.md)
+- [Uploading Releases](docs/Uploading.md)
+- [Architecture](docs/Architecture.md)
+- [Versioned Public API](docs/API.md)
+- [Staged Rollouts](docs/Staged%20Rollouts.md)
+- [Latest Releases](docs/Latest%20Releases.md)
 
 ## FAQ
 
 ### Why does this use a static file store, why not use a traditional update server?
 
-$$$, static file stores quite simply cost less to run than arrays of update servers
-
+$$
 ### Can I use CloudFront to speed up my downloads?
 
 Yes, check out the CloudFront section of the S3 config inside [config.template.js](config.template.js).
@@ -162,3 +161,4 @@ those contributing as an individual.
 ## License
 
 Apache 2.0 © Atlassian Pty Ltd
+$$

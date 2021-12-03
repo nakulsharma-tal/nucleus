@@ -3,7 +3,7 @@
 ## Easy Way
 
 The easiest way to upload releases to Nucleus is to use [`electron-forge`](https://github.com/electron-userland/electron-forge)
-to build and publish your application.  You will find the config required
+to build and publish your application. You will find the config required
 on your App's page inside Nucleus.
 
 Check out the publisher documentation at [https://v6.electronforge.io/publishers/nucleus](https://v6.electronforge.io/publishers/nucleus)

@@ -1,8 +1,8 @@
 .files
-.vscode
 .git
 lib
 public_out
 scripts
 *.log
 node_modules
+.gpg-signing-key

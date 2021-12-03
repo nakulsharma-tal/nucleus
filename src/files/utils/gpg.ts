@@ -11,7 +11,9 @@ export const gpgSign = async (file: string, out: string) => {
     const key = path.resolve(tmpDir, 'key.asc');
     await fs.writeFile(key, config.gpgSigningKey);
     const [stdout, stderr] = await spawnPromiseAndCapture('gpg', ['--import', key]);
-    try { await fs.remove(out); } catch (err) {}
+    try {
+      await fs.remove(out);
+    } catch (err) {}
     const keyImport = stdout.toString() + '--' + stderr.toString();
     const keyMatch = keyImport.match(/ key ([A-Za-z0-9]+):/);
     if (!keyMatch || !keyMatch[1]) {

@@ -16,17 +16,19 @@ module.exports = {
 
   local: {
     root: path.resolve(__dirname, '.files'),
-    staticUrl: 'http://localhost:9999'
+    staticUrl: 'http://localhost:9999',
   },
 
   authStrategy: 'local',
 
-  localAuth: [{
-    displayName: 'Charlie',
-    username: 'charlie',
-    password: 'charlie',
-    photo: 'https://pbs.twimg.com/profile_images/1219364727/charlie-support_400x400.png'
-  }],
+  localAuth: [
+    {
+      displayName: 'Charlie',
+      username: 'charlie',
+      password: 'charlie',
+      photo: 'https://pbs.twimg.com/profile_images/1219364727/charlie-support_400x400.png',
+    },
+  ],
 
   adminIdentifiers: ['charlie'],
 
@@ -195,5 +197,5 @@ ogtdiJMv6zt/bsG7BhDAkiAdabgoqrdojEkKG++F9zcR/gqS7Kr2+mxZe50mWLB5
 MQ==
 =A1i7
 -----END PGP PRIVATE KEY BLOCK-----
-`
+`,
 };

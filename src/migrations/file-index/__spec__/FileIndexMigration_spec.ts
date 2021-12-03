@@ -9,25 +9,33 @@ import LocalStore from '../../../files/local/LocalStore';
 
 const fakeApp = {
   slug: 'app',
-  channels: [{
-    id: 'channel',
-    versions: [{
-      name: 'version',
-      files: [{
-        platform: 'darwin',
-        arch: 'x64',
-        fileName: 'App.dmg',
-      }, {
-        platform: 'win32',
-        arch: 'ia32',
-        fileName: 'App.exe',
-      }, {
-        platform: 'linux',
-        arch: 'x64',
-        fileName: 'App.deb',
-      }],
-    }],
-  }],
+  channels: [
+    {
+      id: 'channel',
+      versions: [
+        {
+          name: 'version',
+          files: [
+            {
+              platform: 'darwin',
+              arch: 'x64',
+              fileName: 'App.dmg',
+            },
+            {
+              platform: 'win32',
+              arch: 'ia32',
+              fileName: 'App.exe',
+            },
+            {
+              platform: 'linux',
+              arch: 'x64',
+              fileName: 'App.deb',
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 describe('FileIndexMigration', () => {
@@ -61,7 +69,7 @@ describe('FileIndexMigration', () => {
       fakeDriver.getApps.returns(Promise.resolve([]));
       expect(await migrator.getItems()).to.deep.equal([]);
     });
-    
+
     it('should check for existence of index files and mark as done appropriately', async () => {
       fakeDriver.getApps.returns(Promise.resolve([fakeApp]));
       const hasFileStub = stub(store, 'hasFile');

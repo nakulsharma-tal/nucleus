@@ -1,7 +1,18 @@
 import { Sequelize } from 'sequelize-typescript';
 
 import BaseDriver from '../BaseDriver';
-import getSequelize, { App, TeamMember, Channel, Version, File, TemporarySave, TemporarySaveFile, WebHook, WebHookError, Migration } from './models';
+import getSequelize, {
+  App,
+  TeamMember,
+  Channel,
+  Version,
+  File,
+  TemporarySave,
+  TemporarySaveFile,
+  WebHook,
+  WebHookError,
+  Migration,
+} from './models';
 import BaseMigration from '../../migrations/BaseMigration';
 import * as config from '../../config';
 
@@ -16,17 +27,19 @@ const includeSettings = {
     TeamMember,
     {
       model: Channel,
-      include: [{
-        model: Version,
-        include: [File],
-      }],
+      include: [
+        {
+          model: Version,
+          include: [File],
+        },
+      ],
     },
   ],
 };
 
 export default class SequelizeDriver extends BaseDriver {
   private sequelize: Sequelize | null;
-  
+
   public async ensureConnected() {
     if (this.sequelize) return;
     const sequelize = await getSequelize();
@@ -39,7 +52,7 @@ export default class SequelizeDriver extends BaseDriver {
     const existingApps = await this.getApps();
     let attempt = 1;
     let proposedSlug = `${this.sluggify(name)}`;
-    while (existingApps.some(app => app.slug === proposedSlug)) {
+    while (existingApps.some((app) => app.slug === proposedSlug)) {
       attempt += 1;
       proposedSlug = `${this.sluggify(name)}${attempt}`;
     }
@@ -98,19 +111,19 @@ export default class SequelizeDriver extends BaseDriver {
     newApp.name = app.name;
     newApp.slug = app.slug;
     newApp.token = app.token;
-    newApp.team = (app.team || []).map(teamMember => teamMember.userId);
-    newApp.channels = (app.channels || []).map(channel => this.fixChannelStruct(channel));
-    newApp.webHooks = (app.webHooks || []).map(webHook => this.fixWebHookStruct(webHook));
+    newApp.team = (app.team || []).map((teamMember) => teamMember.userId);
+    newApp.channels = (app.channels || []).map((channel) => this.fixChannelStruct(channel));
+    newApp.webHooks = (app.webHooks || []).map((webHook) => this.fixWebHookStruct(webHook));
     return newApp;
   }
 
   private fixWebHookStruct(webHook: WebHook): NucleusWebHook {
     return {
       id: webHook.id,
-      url: webHook.url, 
+      url: webHook.url,
       secret: webHook.secret,
       registered: webHook.registered,
-      errors: (webHook.errors || []).map(error => error.get()),
+      errors: (webHook.errors || []).map((error) => error.get()),
     };
   }
 
@@ -118,12 +131,16 @@ export default class SequelizeDriver extends BaseDriver {
     const newChannel: NucleusChannel = {} as any;
     newChannel.id = channel.stringId;
     newChannel.name = channel.name;
-    newChannel.versions = this.orderVersions((channel.versions || [] as Version[]).map(v => v.get() as Version).map(version => ({
-      name: version.name,
-      dead: version.dead,
-      rollout: version.rollout,
-      files: (version.files || []).map(f => f.get() as File).map(this.fixFileStruct),
-    })));
+    newChannel.versions = this.orderVersions(
+      (channel.versions || ([] as Version[]))
+        .map((v) => v.get() as Version)
+        .map((version) => ({
+          name: version.name,
+          dead: version.dead,
+          rollout: version.rollout,
+          files: (version.files || []).map((f) => f.get() as File).map(this.fixFileStruct),
+        })),
+    );
     return newChannel;
   }
 
@@ -142,7 +159,7 @@ export default class SequelizeDriver extends BaseDriver {
   public async getApps() {
     await this.ensureConnected();
     const apps = await App.findAll<App>(includeSettings);
-    return apps.map(app => this.fixAppStruct(app.get()));
+    return apps.map((app) => this.fixAppStruct(app.get()));
   }
 
   public async getApp(id: AppID) {
@@ -180,10 +197,12 @@ export default class SequelizeDriver extends BaseDriver {
   public async getChannel(app: NucleusApp, channelId: ChannelID) {
     await this.ensureConnected();
     const channel = await Channel.findOne({
-      include: [{
-        model: Version,
-        include: [File],
-      }],
+      include: [
+        {
+          model: Version,
+          include: [File],
+        },
+      ],
       where: {
         appId: parseInt(app.id!, 10),
         stringId: channelId,
@@ -214,7 +233,7 @@ export default class SequelizeDriver extends BaseDriver {
       version: save.version,
       arch: save.arch,
       date: save.date,
-      filenames: (save.files || []).map(file => file.name),
+      filenames: (save.files || []).map((file) => file.name),
       cipherPassword: save.cipherPassword,
     };
   }
@@ -245,10 +264,17 @@ export default class SequelizeDriver extends BaseDriver {
       },
       include: [TemporarySaveFile],
     });
-    return saves.map(save => this.fixSaveStruct(save));
+    return saves.map((save) => this.fixSaveStruct(save));
   }
 
-  public async saveTemporaryVersionFiles(app: NucleusApp, channel: NucleusChannel, version: string, filenames: string[], arch: string, platform: NucleusPlatform) {
+  public async saveTemporaryVersionFiles(
+    app: NucleusApp,
+    channel: NucleusChannel,
+    version: string,
+    filenames: string[],
+    arch: string,
+    platform: NucleusPlatform,
+  ) {
     await this.ensureConnected();
 
     const rawChannel = (await Channel.findOne<Channel>({
@@ -265,7 +291,7 @@ export default class SequelizeDriver extends BaseDriver {
       channelId: rawChannel.id,
     });
     await save.save();
-    
+
     for (const fileName of filenames) {
       const file = new TemporarySaveFile({
         name: fileName,
@@ -290,9 +316,9 @@ export default class SequelizeDriver extends BaseDriver {
       include: [File],
     });
     if (!dbVersion) {
-      const channelHasVersion = !!(Version.findOne<Version>({
+      const channelHasVersion = !!Version.findOne<Version>({
         where: { channelId: rawSave.channelId },
-      }));
+      });
       dbVersion = new Version({
         name: save.version,
         dead: false,
@@ -305,7 +331,9 @@ export default class SequelizeDriver extends BaseDriver {
 
     const storedFileNames: string[] = [];
     for (const fileName of save.filenames) {
-      if (!(dbVersion.files || []).some(file => this.isInherentlySameFile(file.fileName, fileName))) {
+      if (
+        !(dbVersion.files || []).some((file) => this.isInherentlySameFile(file.fileName, fileName))
+      ) {
         storedFileNames.push(fileName);
         const newFile = new File({
           fileName,
@@ -359,7 +387,13 @@ export default class SequelizeDriver extends BaseDriver {
     await webHook.destroy();
   }
 
-  public async createWebHookError(app: NucleusApp, webHookId: number, message: string, code: number, body: string) {
+  public async createWebHookError(
+    app: NucleusApp,
+    webHookId: number,
+    message: string,
+    code: number,
+    body: string,
+  ) {
     const error = new WebHookError({
       webHookId,
       message: message.substr(0, 1000),
@@ -379,7 +413,12 @@ export default class SequelizeDriver extends BaseDriver {
     return this.fixWebHookStruct(webHook);
   }
 
-  public async setVersionDead(app: NucleusApp, channel: NucleusChannel, versionName: string, dead: boolean) {
+  public async setVersionDead(
+    app: NucleusApp,
+    channel: NucleusChannel,
+    versionName: string,
+    dead: boolean,
+  ) {
     await this.ensureConnected();
     const rawChannel = await Channel.findOne<Channel>({
       where: {
@@ -400,19 +439,27 @@ export default class SequelizeDriver extends BaseDriver {
     return this.fixChannelStruct(rawChannel.get());
   }
 
-  public async setVersionRollout(app: NucleusApp, channel: NucleusChannel, versionName: string, rollout: number) {
+  public async setVersionRollout(
+    app: NucleusApp,
+    channel: NucleusChannel,
+    versionName: string,
+    rollout: number,
+  ) {
     await this.ensureConnected();
     const rawChannel = await Channel.findOne<Channel>({
       where: {
         appId: parseInt(app.id!, 10),
         stringId: channel.id,
       },
-      include: [{
-        model: Version,
-        include: [File],
-      }],
+      include: [
+        {
+          model: Version,
+          include: [File],
+        },
+      ],
     });
-    if (!rawChannel || !rawChannel.versions || rollout < 0 || rollout > 100) return (await this.getChannel(app, channel.id!))!;
+    if (!rawChannel || !rawChannel.versions || rollout < 0 || rollout > 100)
+      return (await this.getChannel(app, channel.id!))!;
     for (const version of rawChannel.versions) {
       if (version.name === versionName) {
         version.set('rollout', rollout);
